@@ -123,6 +123,8 @@ class LoginWindow:
         self.draw_button_box()
 
         self.box.show()
+
+    def show(self):
         self.window.show()
 
 

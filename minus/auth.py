@@ -1,10 +1,10 @@
-from transport import MinusTransport
+from transport import RestTransport
 
 
 class MinusAuth(object):
 
-    client_id = ''
-    client_secret = ''
+    client_id = '9991669c2676a465f60bc81edc3ebd'
+    client_secret = '3d015def7697e106c8f402affd3983'
     access_token = None
     refresh_token = None
     scope = 'read_all'
@@ -20,7 +20,8 @@ class MinusAuth(object):
             'grant_type': 'password'
         }
         try:
-            response = MinusTransport.post('oauth/token', params=params)
+            transport = RestTransport()
+            response = transport.post('oauth/token', params=params)
         except Exception, exc:
             return False
 

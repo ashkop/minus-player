@@ -9,9 +9,12 @@ import gtk
 auth = MinusAuth()
 def login_success():
 
-    player = PlayerWindow(auth)
+    m_transport = MinusTransport(auth)
+    api = MinusApi(m_transport)
+    player = PlayerWindow(api)
+
+login = LoginWindow(login_success, auth)
 
 if __name__ == "__main__":
-
-    login = LoginWindow(login_success, auth)
+    login.show()
     gtk.main()

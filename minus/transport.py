@@ -1,5 +1,6 @@
 import urllib2, urllib
 import json
+import urlparse
 
 
 class ErrorHandler(urllib2.HTTPDefaultErrorHandler):
@@ -22,7 +23,7 @@ class ErrorHandler(urllib2.HTTPDefaultErrorHandler):
     
 class RestTransport(object):
 
-    api_domain = ''
+    api_domain = r'https://minus.com/'
 
     def __init__(self):
         opener = urllib2.build_opener(ErrorHandler())
@@ -32,20 +33,18 @@ class RestTransport(object):
 
         if method not in ['GET', 'POST']:
             raise Exception('Unknown request method')
-        if hasattr(self, 'auth') and self.auth:
-            params['bearer_token'] = self.auth.access_token
         url_params = urllib.urlencode(params)
+        if urlparse.urlparse(url).scheme == '':
+            url = self.api_domain + url
+        else:
+            url = self.api_domain +  urlparse.urlparse(url).path
         if method == 'GET':
             if url_params:
-                request = urllib2.Request(self.api_domain + url + '?' +url_params)
+                request = urllib2.Request(url + '?' +url_params)
             else:
-                request = urllib2.Request(self.api_domain + url)
+                request = urllib2.Request(url)
         else:
-            request = urllib2.Request(self.api_domain + url, url_params)
-
-
-
-
+            request = urllib2.Request(url, url_params)
 
         return request
 
@@ -60,5 +59,14 @@ class RestTransport(object):
         return json.loads(response.read())
 
 
-MinusTransport = RestTransport()
-MinusTransport.api_domain = 'https://minus.com/'
+class MinusTransport(RestTransport):
+
+    api_domain = 'https://minus.com/'
+
+    def __init__(self, auth):
+        super(MinusTransport, self).__init__()
+        self.auth = auth
+
+    def generate_request(self, method, url, params):
+        params['bearer_token'] = self.auth.access_token
+        return super(MinusTransport, self).generate_request(method, url, params)
